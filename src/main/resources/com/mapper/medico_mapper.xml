@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.medico_mapper">
+
+
+    <select id="selectclient" resultType="com.pojo.medico.Client">
+        select *from client;
+    </select>
+
+    <insert id="addclient">
+  insert into client values(#{id},#{clientname},#{clientgender},#{clientage},#{clientsalary});
+</insert>
+
+    <select id="selecttotalpage" resultType="java.lang.Integer">
+        select count(*) from client;
+    </select>
+    <select id="selectpagelist" resultType="com.pojo.medico.Client">
+        select * from client limit #{start},#{num};
+    </select>
+    <select id="selectbycondition" resultType="com.pojo.medico.Client">
+        select *from client <where>
+        <if test="client.id !=0"> id like #{client.id}</if>
+        <if test="client.clientname !=null and client.clientname!=''">and clientname like #{client.clientname}</if>
+        <if test="client.clientgender !=null and client.clientgender!=''">and clientgender like #{client.clientgender}</if>
+    </where> limit #{start},#{num};
+    </select>
+    <select id="selecttotalbycondition" resultType="java.lang.Integer">
+        select count(*) from client <where>
+        <if test="id !=0"> id like #{id}</if>
+        <if test="clientname !=null and clientname!=''">and clientname like #{clientname}</if>
+        <if test="clientgender !=null and clientgender!=''">and clientgender like #{clientgender}</if>
+    </where>
+    </select>
+
+    <update id="updateclient">
+        update client <set>
+        <if test="clientname!=null and clientname!=''">clientname=#{clientname}</if>
+        <if test="clientgender !=null and clientgender!=''">,clientgender=#{clientgender}</if>
+        <if test="clientage !=null and clientage!=''">,clientage=#{clientage}</if>
+        <if test="clientsalary !=null and clientsalary!=''">,clientsalary=#{clientsalary}</if>
+    </set>
+        where id=#{id};
+    </update>
+
+    <delete id="deleteclient">
+        delete from client where id=#{id};
+     </delete>
+
+    <!--添加病例-->
+    <insert id="caseinsert">insert into caseol(medicinename,casename,clientid) values(#{medicinename},#{casename},#{clientid})</insert>
+    <!--按条件搜索病例，对病例进行分页展示-->
+    <select id="selectbycondition2" resultType="com.pojo.medico.Case">
+        SELECT caseol.clientid,client.clientname,client.clientgender,caseol.medicinename,caseol.casename,caseol.id
+        from caseol join client on caseol.clientid=client.id<where>
+        <if test="caseol.id !=0"> client.id like #{caseol.id}</if>
+        <if test="caseol.clientname !=null and caseol.clientname!=''">and client.clientname like #{caseol.clientname}</if>
+    </where>limit #{start},#{num};
+    </select>
+    <!--按条件搜索病例的数目-->
+    <select id="selecttotalbycondition2" resultType="java.lang.Integer">
+        SELECT count(*) from caseol join client on caseol.clientid=client.id<where>
+        <if test="id !=0"> client.id like #{id}</if>
+        <if test="clientname !=null and clientname!=''">and client.clientname like #{clientname}</if>
+    </where>
+    </select>
+<!--修改病例-->
+    <update id="updatecase">
+        update caseol<set>
+        <if test="casename!=null and casename!=''">casename=#{casename}</if>
+        <if test="medicinename!=null and medicinename!=''">,medicinename=#{medicinename}</if>
+    </set>
+        where id=#{id};
+    </update>
+<!--删除病例-->
+    <delete id="deletecase">
+        delete from caseol where id=#{id};
+    </delete>
+</mapper>

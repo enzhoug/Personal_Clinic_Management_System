@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.user_mapper">
+    <!--验证注册信息-->
+    <select id="selectByname" resultType="com.pojo.administrator.User">
+        select *from userol where username=#{username};
+    </select>
+    <!--将注册信息加入到数据库-->
+    <insert id="adduser" useGeneratedKeys="true" keyProperty="id">
+        insert into userol(username,password) values(#{username},#{password});
+    </insert>
+
+    <!--登录功能-->
+    <select id="selectBynamepassword" resultType="com.pojo.administrator.User">
+        select *from userol where username=#{username} and password=#{password};
+    </select>
+</mapper>

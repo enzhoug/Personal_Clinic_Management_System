@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>医生信息</title>
+</head>
+<style>
+    .el-table .warning-row {
+        background: oldlace;
+    }
+
+    .el-table .success-row {
+        background: #f0f9eb;
+    }
+</style>
+<!--样式-->
+<style>
+    .el-header{
+        background-color: #f0f4fa;
+        color: #409eff;
+        text-align: left;
+        font-size:30px;
+        line-height: 80px;
+    }
+
+    .el-main {
+        background-color: #ffffff;
+        color: #ffffff;
+        text-align: left;
+        font-size: 50px;
+        line-height: 60px;
+    }
+    .el-aside {
+        background-color: #ddebff;
+        color: #1b51ce;
+        text-align: center;
+        font-size: 20px;
+        line-height: 30px;
+    }
+    .el-container:nth-child(1).el-header{
+        background-color: #ffffff;
+        color: #1b51ce;
+        text-align: left;
+        font-size:30px;
+        line-height: 80px;
+    }
+</style>
+<body>
+
+<!--<h1>hello,${username}</h1>-->
+<!--<p><a href="addpage.html">添加医生</a></p>-->
+<!--顶部样式-->
+<div id="doctor1" >
+    <el-container>
+        <el-header height="80px">个人诊所管理系统（医生信息）</el-header>
+        <el-container>
+            <el-aside width="200px"><!--导航-->
+                        <el-menu
+                                default-active="2"
+                                class="el-menu-vertical-demo"
+                                background-color="Transparent"
+                                text-color="#409eff"
+                                active-text-color="#409eff">
+                            <i class="el-icon-s-platform">管理员</i>
+                            <el-menu-item index="2" route="http://localhost:8080/Personal_Clinic_Management_System_war/html/administrator_medicine.html">
+                                <i class="el-icon-user-solid"></i>
+                                <span slot="title">医 生 管 理</span>
+                            </el-menu-item>
+                            <el-menu-item index="3" >
+                                <i class="el-icon-water-cup" @click="skip"></i>
+                                 <span slot="title" ><el-link :underline="false" type="primary" href="http://localhost:8080/Personal_Clinic_Management_System_war/html/administrator_medicine.html">药 品 管 理</el-link></span>
+                            </el-menu-item>
+                            <el-menu-item index="4">
+                                <i class="el-icon-medal-1"></i>
+                                <span slot="title">关 于 我 们</span>
+                            </el-menu-item>
+                        </el-menu>
+
+                </el-aside>
+            <el-container direction="horizontal">
+                <el-main><!--搜索表单-->
+                    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                        <el-form-item label="医生工号">
+                            <el-input v-model="formInline.id" placeholder="医生工号"></el-input>
+                        </el-form-item>
+                        <el-form-item label="医生姓名">
+                            <el-input v-model="formInline.doctorname" placeholder="医生姓名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="医生性别">
+                            <el-select v-model="formInline.doctorgender" placeholder="医生性别">
+                                <el-option label="男" value="男"></el-option>
+                                <el-option label="女" value="女"></el-option>
+                                <el-option label="全部" value=''></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit">查询</el-button>
+                        </el-form-item>
+                    </el-form><hr>
+                    <!--增加按钮-->
+                    <el-row>
+                        <el-button type="primary" plain @click="dialogVisible = true">新增</el-button>
+                    </el-row>
+                    <!--表格-->
+                    <template >
+                        <el-table
+                                :data="doctors"
+                                stripe
+                                style="width: 150%"
+                                size="medium"
+                                >
+                            <el-table-column
+
+                                    type="index"
+                                    label="序号"
+                                    align="center"
+                                    width="50">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="id"
+                                    label="工号"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="doctorname"
+                                    label="姓名"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="doctorgender"
+                                    label="性别"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="doctorage"
+                                    label="年龄"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="doctorsalary"
+                                    label="月薪"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    label="操作"
+                                    align="center"
+                            >
+                                <el-row slot-scope="scope">
+                                    <el-button type="primary"  @click="handleEdit(scope.$index,scope.row.id)">修改</el-button>
+                                    <el-button type="danger" @click="open(scope.row.id)">删除</el-button>
+                                </el-row>
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                    <!--分页条-->
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage4"
+                            :page-sizes="[5, 7, 9, 11]"
+                            :page-size="100"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination></el-main>
+        </el-container></el-container>
+    </el-container>
+    <!--修改-->
+    <el-dialog
+            title="修改信息"
+            :visible.sync="dialogVisible2"
+            width="30%"
+    >
+        <span>
+     <!--修改表单-->
+        <el-form ref="form" :model="form" label-width="80px">
+        <!--    <el-form-item label="修改工号">
+    <el-input v-model="form.id" ></el-input>
+  </el-form-item>-->
+            <p>   工号：{{form.id}}</p>
+  <el-form-item label="修改姓名" >
+    <el-input v-model="form.doctorname" placeholder=""></el-input>
+  </el-form-item>
+  <el-form-item label="修改性别">
+    <el-select v-model="form.doctorgender" placeholder="请选择性别">
+      <el-option label="男" value="男"></el-option>
+      <el-option label="女" value="女"></el-option>
+    </el-select>
+  </el-form-item>
+            <el-form-item label="修改年龄">
+    <el-input v-model="form.doctorage"></el-input>
+  </el-form-item>
+            <el-form-item label="修改月薪">
+    <el-input v-model="form.doctorsalary"></el-input>
+  </el-form-item>
+</el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="onupdate()" >确 定</el-button>
+    <el-button @click="dialogVisible2 = false">取 消</el-button>
+  </span>
+    </el-dialog>
+    <!--增加的对话框-->
+    <el-dialog
+            title="医生信息"
+            :visible.sync="dialogVisible"
+            width="30%"
+    >
+        <!--增加的表单-->
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="医生工号" prop="id">
+                <el-input v-model="ruleForm.id"></el-input>
+            </el-form-item>
+            <el-form-item label="医生姓名" prop="doctorname">
+                <el-input v-model="ruleForm.doctorname"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" prop="doctorgender">
+                <el-select v-model="ruleForm.doctorgender" placeholder="请选择性别">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                </el-select> </el-form-item>
+            <el-form-item label="年龄" prop="doctorage">
+                <el-input v-model="ruleForm.doctorage"></el-input>
+            </el-form-item>
+            <el-form-item label="月薪" prop="doctorsalary">
+                <el-input v-model="ruleForm.doctorsalary"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+                <el-button @click="resetForm('ruleForm')">重置</el-button>
+            </el-form-item></el-form>
+
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+  </span>
+    </el-dialog>
+
+</div>
+<!--修改删除-->
+<!--引入框架-->
+<script src="../js/vue.js"></script>
+<script src="../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../element-ui/lib/theme-chalk/index.css">
+<script src="../js/axios-0.18.0.js"></script>
+<script>
+    //修改删除
+    //其它功能
+    new Vue({
+        el:"#doctor1",
+            methods: {
+            //导航
+               skip(){
+                   axios.get("http://localhost:8080/Personal_Clinic_Management_System_war/jsp/administrator_login.jsp").then(function (resp) {
+                   });
+                   //alert("hh");
+                  //this.$router.push("http://localhost:8080/Personal_Clinic_Management_System_war/jsp/administrator_login.jsp");
+               },
+            //
+
+                //查询分页信息
+                selectall(){
+                    var that=this;
+                    axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/administrator/pageselectbycondition?currentpage="+that.currentPage+"&size="+that.pagesize+"",this.formInline).then(function (resp) {
+                        that.doctors=resp.data.pagelist;
+                        that.total=resp.data.totalpage;
+                    })
+                },
+                //顶部搜索相关
+                onSubmit() {
+                    //console.log(this.formInline);
+                    this.selectall();
+                },
+                //增加医生失败与成功提示
+                open2() {
+                    this.$message({
+                        message: '操作成功',
+                        type: 'success'
+                    });
+                },
+                //增加医生相关
+                submitForm(formName) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            //点击创建后传递数据至数据库
+                            //当点击确认发送Ajax
+                            var that=this;
+                            axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/administrator/addpage",that.ruleForm).then(function (resp){
+                                if (resp.data="sucess"){
+                                    //alert("添加成功")
+                                    //location.href="http://localhost:8080/managepage_war/html/page.html"
+                                    that.dialogVisible=false;
+                                    that.selectall();
+                                    that.open2().$message;
+                                }else{
+                                    //that.open4().$message;
+                                    that.$message.error('操作失败');
+                                    //alert("添加失败，请重试");
+                                }
+                            });
+                        } else {
+                            console.log('error submit!!');
+                            return false;
+                        }
+                    });
+                },
+                resetForm(formName) {
+                    this.$refs[formName].resetFields();
+                },
+                //分页条
+                handleSizeChange(val) {
+                    //console.log(`每页 ${val} 条`);
+                    this.pagesize=val;
+                    this.selectall();
+                },
+                handleCurrentChange(val) {
+                    //console.log(`当前页: ${val}`);
+                    this.currentPage=val;
+                    this.selectall();
+                },
+                //修改
+                handleEdit(index,id) {
+                    //console.log(index);
+                    //alert(id);
+                    this.form.id=id;
+                    this.dialogVisible2 = true;
+                },
+                onupdate(){
+                    var that=this;
+                    axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/administrator/pageupdate",that.form).then(function (resp){
+                        if (resp.data="success"){
+                            that.dialogVisible2 = false;
+                            that.selectall();
+                            that.open2().$message;
+                        }else{
+                            that.$message.error('操作失败');
+                        }
+                })
+            },
+            //删除
+                open(id) {
+                    this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        var that=this;
+                        axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/administrator/pagedelete","id="+id).then(function (resp){
+                            that.selectall();
+                        })
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                }
+            },
+        data(){
+            return{
+                //增加对话框展示与否
+                dialogVisible: false,
+                //修改删除
+                dialogVisible2: false,
+                //增加医生信息
+                ruleForm: {
+                    id:'',
+                    doctorname: '',
+                    doctorgender:'',
+                    doctorage:'',
+                    doctorsalary:''
+                },
+                rules: {
+                    id: [
+                        { required: true, message: '请输入工号', trigger: 'blur' },
+                    ],
+                    doctorname: [
+                        { required: true, message: '请输入姓名', trigger: 'blur' },
+                       // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+                    ],
+                    doctorgender: [
+                        { required: true, message: '请选择性别', trigger: 'change' }
+                    ],
+                    doctorage: [
+                        { required: true, message: '请输入年龄', trigger: 'blur' },
+                    ],
+                    doctorsalary: [
+                        { required: true, message: '请输入月薪', trigger: 'blur' },
+                    ]
+                },
+                //搜索医生
+                formInline: {
+                    id: '',
+                    doctorname: '',
+                    doctorgender: ''
+                },
+                //从数据库查找
+                doctors:[],
+                //底部分页条,当前页
+                currentPage: 1,
+                //总条数
+                total:0,
+                //每页显示的条数
+                pagesize:5,
+                //修改
+                form: {
+                    id:'',
+                    doctorname: '',
+                    doctorgender: '',
+                    doctorage:'',
+                    doctorsalary:''
+                }
+            }
+        },
+        //页面加载完成后发送请求，并接受数据
+        mounted(){
+            this.selectall()
+        }
+    })
+</script>
+<hr>
+<center><font face="楷体" size="4" color="#a9a9a9">神洲科技有限公司&reg; 京公网安备11000000000001号 京ICP证010100号 版权所有,侵权必究&copy; 联系开发者:enzhoug@foxmail.com</font></center>
+<br><br><br><br>
+</body>
+</html>

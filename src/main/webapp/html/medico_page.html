@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户信息</title>
+</head>
+<style>
+    .el-table .warning-row{
+        background:oldlace;
+    }
+
+    .el-table .success-row{
+        background:#f0f9eb;
+    }
+</style>
+<!--样式-->
+<style>
+    .el-header{
+        background-color:#f0f4fa;
+        color:#409eff;
+        text-align:left;
+        font-size:30px;
+        line-height:80px;
+    }
+
+    .el-main{
+        background-color:#ffffff;
+        color:#ffffff;
+        text-align:left;
+        font-size:50px;
+        line-height:60px;
+    }
+    .el-aside{
+        background-color:#ddebff;
+        color:#1b51ce;
+        text-align:center;
+        font-size:20px;
+        line-height:30px;
+    }
+    .el-container:nth-child(1).el-header{
+        background-color:#ffffff;
+        color:#1b51ce;
+        text-align:left;
+        font-size:30px;
+        line-height:80px;
+    }
+</style>
+<body>
+
+<!--<h1>hello,${username}</h1>-->
+<!--<p><ahref="addpage.html">添加医生</a></p>-->
+<!--顶部样式-->
+<div id="doctor1">
+    <el-container>
+        <el-header height ="80px">个人诊所管理系统（客户信息）</el-header>
+        <el-container>
+            <el-aside width="200px"><!--导航-->
+                <el-menu
+                        default-active="2"
+                        class="el-menu-vertical-demo"
+                        background-color="Transparent"
+                        text-color="#409eff"
+                        active-text-color="#409eff">
+                    <i class="el-icon-s-platform">医生</i>
+                    <el-menu-item index="2">
+                        <i class="el-icon-phone-outline" @click="skip"></i>
+                        <span slot="title"><el-link :underline="false" type="primary" href="http://localhost:8080/Personal_Clinic_Management_System_war/html/medico_page.html">客户管理</el-link></span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-s-order"></i>
+                        <span slot ="title"><el-link :underline="false" type="primary" href="http://localhost:8080/Personal_Clinic_Management_System_war/html/medico_case.html">病例管理</el-link></span>
+                    </el-menu-item>
+                    <el-menu-item index="4">
+                        <i class ="el-icon-medal-1"></i>
+                        <span slot="title">关于我们</span>
+                    </el-menu-item>
+                </el-menu>
+
+            </el-aside>
+            <el-container direction="horizontal">
+                <el-main><!--搜索表单-->
+                    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                        <el-form-item label="客户编号">
+                            <el-input v-model="formInline.id" placeholder="客户编号"></el-input>
+                        </el-form-item>
+                        <el-form-item label="客户姓名">
+                            <el-input v-model="formInline.clientname" placeholder="客户姓名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="客户性别">
+                            <el-select v-model="formInline.clientgender" placeholder="客户性别">
+                                <el-option label="男" value="男"></el-option>
+                                <el-option label="女" value="女"></el-option>
+                                <el-option label="全部" value=''></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit">查询</el-button>
+                        </el-form-item>
+                    </el-form><hr>
+                    <!--增加按钮-->
+                    <el-row>
+                        <el-button type="primary" plain @click="dialogVisible=true">新增</el-button>
+                    </el-row>
+                    <!--表格-->
+                    <template>
+                        <el-table
+                                :data="clients"
+                                stripe
+                                style="width:150%"
+                                size="medium"
+                        >
+                            <el-table-column
+
+                                    type="index"
+                                    label="序号"
+                                    align="center"
+                                    width="50">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="id"
+                                    label="编号"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="clientname"
+                                    label="姓名"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="clientgender"
+                                    label="性别"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="clientage"
+                                    label="年龄"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="clientsalary"
+                                    label="消费额"
+                                    align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                                    label="操作"
+                                    align="center"
+                            >
+                                <el-row slot-scope="scope">
+                                    <el-button type="primary" @click="handleEdit(scope.$index,scope.row.id)">修改</el-button>
+                                    <el-button type="danger" @click="open(scope.row.id)">删除</el-button>
+                                    <el-button type="success" @click="prescribe(scope.row.id)">开药</el-button>
+                                </el-row>
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                    <!--分页条-->
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage4"
+                            :page-sizes="[5,7,9,11]"
+                            :page-size="100"
+                            layout="total,sizes,prev,pager,next,jumper"
+                            :total="total">
+                    </el-pagination></el-main>
+            </el-container></el-container>
+    </el-container>
+    <!--修改-->
+    <el-dialog
+            title="修改信息"
+            :visible.sync="dialogVisible2"
+            width="30%"
+    >
+<span>
+<!--修改表单-->
+<el-form ref="form" :model="form" label-width="80px">
+    <!--<el-form-itemlabel="修改工号">
+    <el-inputv-model="form.id"></el-input>
+    </el-form-item>-->
+<p>编号：{{form.id}}</p>
+<el-form-item label="修改姓名">
+<el-input v-model="form.clientname" placeholder=""></el-input>
+    </el-form-item>
+    <el-form-item label="修改性别">
+<el-select v-model="form.clientgender" placeholder="请选择性别">
+<el-option label="男" value="男"></el-option>
+    <el-option label="女" value="女"></el-option>
+    </el-select>
+    </el-form-item>
+    <el-form-item label="修改年龄">
+<el-input v-model="form.clientage"></el-input>
+    </el-form-item>
+    <el-form-item label="修改消费">
+<el-input v-model="form.clientsalary"></el-input>
+    </el-form-item>
+    </el-form>
+</span>
+        <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="onupdate()">确定</el-button>
+    <el-button @click="dialogVisible2=false">取消</el-button>
+    </span>
+    </el-dialog>
+    <!--增加的对话框-->
+    <el-dialog
+            title="客户信息"
+            :visible.sync="dialogVisible"
+            width="30%"
+    >
+        <!--增加的表单-->
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="客户编号" prop="id">
+                <el-input v-model="ruleForm.id"></el-input>
+            </el-form-item>
+            <el-form-item label="客户姓名" prop="clientname">
+                <el-input v-model="ruleForm.clientname"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" prop="clientgender">
+                <el-select v-model="ruleForm.clientgender" placeholder="请选择性别">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                </el-select></el-form-item>
+            <el-form-item label="年龄" prop="clientage">
+                <el-input v-model="ruleForm.clientage"></el-input>
+            </el-form-item>
+            <el-form-item label="消费金额" prop="clientsalary">
+                <el-input v-model="ruleForm.clientsalary"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+                <el-button @click="resetForm('ruleForm')">重置</el-button>
+            </el-form-item></el-form>
+
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible=false">取消</el-button>
+    <el-button type="primary" @click="dialogVisible=false">确定</el-button>
+    </span>
+    </el-dialog>
+    <!--开药的对话框-->
+    <el-dialog
+            title="药库"
+            :visible.sync="dialogVisible3"
+            width="30%">
+<span>
+<!--搜索药品-->
+<el-form :inline="true" :model="formInline2" class="demo-form-inline">
+<el-form-item label="药品编号">
+<el-input v-model="formInline2.id" placeholder="药品编号"></el-input>
+    </el-form-item>
+    <el-form-item label="药品名称">
+<el-input v-model="formInline2.medicinename" placeholder="药品名称"></el-input>
+    </el-form-item>
+    <el-form-item>
+<el-button type="primary" @click="onSubmit2">查询</el-button>
+</el-form-item>
+    </el-form>
+    <!--表格-->
+<template>
+<el-table
+        :data="medicines"
+        stripe
+        style="width:150%"
+        size="medium"
+>
+<el-table-column
+
+        type="index"
+        label="序号"
+        align="center"
+        width="50">
+</el-table-column>
+<el-table-column
+        prop="id"
+        label="药品编号"
+        align="center"
+>
+</el-table-column>
+<el-table-column
+        prop="medicinename"
+        label="药品名称"
+        align="center"
+>
+</el-table-column>
+<el-table-column
+        prop="medicineprice"
+        label="价格"
+        align="center"
+>
+</el-table-column>
+<el-table-column
+        prop="medicinesupplier"
+        label="供应商"
+        align="center"
+>
+</el-table-column>
+<el-table-column
+        label="操作"
+        align="center"
+>
+<el-row slot-scope="scope">
+<el-button type="primary" @click="handleEdit2(scope.$index,scope.row.medicinename)">开药</el-button>
+    </el-row>
+</el-table-column>
+</el-table>
+</template>
+</span>
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible3=false">取消</el-button>
+    <el-button type="primary" @click="dialogVisible3=false">确定</el-button>
+    </span>
+    </el-dialog>
+    <!--开药填病例对话框-->
+    <el-dialog
+            title="填写病例"
+            :visible.sync="dialogVisible4"
+            width="30%">
+<span>
+<el-form ref="form" :model="form2" label-width="80px">
+<el-form-item label="症状">
+<el-input v-model="form2.casename" placeholder="请输入病情"></el-input>
+    </el-form-item>
+    <el-form-item>
+<el-button type="primary" @click="submit">确定</el-button>
+        <el-button @click="dialogVisible4 =false">取消</el-button>
+</el-form-item>
+    </el-form>
+
+</span>
+    </el-dialog>
+</div>
+<!--修改删除-->
+<!--引入框架-->
+<script src="../js/vue.js"></script>
+<script src="../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../element-ui/lib/theme-chalk/index.css">
+<script src="../js/axios-0.18.0.js"></script>
+<script>
+    //修改删除
+    //其它功能
+    new Vue({
+        el: "#doctor1",
+        methods:{
+//导航
+            skip(){
+                axios.get("http://localhost:8080/Personal_Clinic_Management_System_war/jsp/medico_login.jsp").then(function(resp){
+                });
+//alert("hh");
+//this.$router.push("http://localhost:8080/Personal_Clinic_Management_System_war/jsp/administrator_login.jsp");
+            },
+//
+
+//查询分页信息
+            selectall(){
+                var that=this;
+                axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/medico/pageselectbycondition?currentpage="+that.currentPage+"&size="+that.pagesize+"",this.formInline).then(function(resp){
+                    that.clients=resp.data.pagelist;
+                    that.total=resp.data.totalpage;
+                })
+            },
+            selectmedicine(){
+                var that=this;
+                axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/administrator/medicineselectbycondition?currentpage=1&size=100",this.formInline2).then(function(resp){
+                    that.medicines=resp.data.pagelist;
+//that.total=resp.data.totalpage;
+                })
+            },
+//顶部搜索相关
+            onSubmit(){
+//console.log(this.formInline);
+                this.selectall();
+            },
+//增加医生失败与成功提示
+            open2(){
+                this.$message({
+                    message:'操作成功',
+                    type:'success'
+                });
+            },
+//增加医生相关
+            submitForm(formName){
+                this.$refs[formName].validate((valid)=>{
+                    if(valid){
+//点击创建后传递数据至数据库
+//当点击确认发送Ajax
+                        var that=this;
+                        axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/medico/addpage",that.ruleForm).then(function(resp){
+                            if(resp.data="sucess"){
+//alert("添加成功")
+//location.href="http://localhost:8080/managepage_war/html/page.html"
+                                that.dialogVisible=false;
+                                that.selectall();
+                                that.open2().$message;
+                            }else{
+//that.open4().$message;
+                                that.$message.error('操作失败');
+//alert("添加失败，请重试");
+                            }
+                        });
+                    }else{
+//console.log('errorsubmit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName){
+                this.$refs[formName].resetFields();
+            },
+//分页条
+            handleSizeChange(val){
+//console.log(`每页${val}条`);
+                this.pagesize=val;
+                this.selectall();
+            },
+            handleCurrentChange(val){
+//console.log(`当前页:${val}`);
+                this.currentPage=val;
+                this.selectall();
+            },
+//修改
+            handleEdit(index,id){
+//console.log(index);
+//alert(id);
+                this.form.id=id;
+                this.dialogVisible2=true;
+            },
+            onupdate(){
+                var that=this;
+                axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/medico/pageupdate",that.form).then(function(resp){
+                    if(resp.data="success"){
+                        that.dialogVisible2=false;
+                        that.selectall();
+                        that.open2().$message;
+                    }else{
+                        that.$message.error('操作失败');
+                    }
+                })
+            },
+//删除
+            open(id){
+                this.$confirm('此操作将永久删除该文件,是否继续?','提示',{
+                    confirmButtonText:'确定',
+                    cancelButtonText:'取消',
+                    type:'warning'
+                }).then(()=>{
+                    var that=this;
+                    axios.post("http://localhost:8080/Personal_Clinic_Management_System_war/medico/pagedelete","id="+id).then(function(resp){
+                        that.selectall();
+                    })
+                    this.$message({
+                        type:'success',
+                        message:'删除成功!'
+                    });
+                }).catch(()=>{
+                    this.$message({
+                        type:'info',
+                        message:'已取消删除'
+                    });
+                });
+            },
+//开药表单
+            prescribe(id){
+                this.clientid=id;
+                this.dialogVisible3=true;
+                this.selectmedicine();
+            },
+//搜索药物
+            onSubmit2(){
+//console.log(this.formInline);
+                this.selectmedicine();
+            },
+//开药
+            handleEdit2(index,medicinename){
+                this.medicinename1=medicinename;
+                this.dialogVisible4=true;
+            },
+            submit(){
+                dialogVisible4=false;
+                var that=this;
+                axios.get("http://localhost:8080/Personal_Clinic_Management_System_war/medico/caseinsert?casename="+that.form2.casename+"&medicinename="+that.medicinename1+"&clientid="+that.clientid+"").then(function(resp){
+                    if(resp.data="success"){
+                        that.dialogVisible4=false;
+                        that.open2().$message;
+                    }else{
+                        that.$message.error('操作失败');
+                    }
+                })
+            }
+        },
+        data(){
+            return{
+//病情
+                form2:{casename:""},
+//药名
+                medicinename1:"",
+//病人id
+                clientid:0,
+//搜索药
+                formInline2:{
+                    id:'',
+                    medicinename:''
+                },
+//从数据库查找药物
+                medicines:[],
+//增加对话框展示与否
+                dialogVisible: false,
+//修改删除
+                dialogVisible2: false,
+//开药对话框
+                dialogVisible3: false,
+//输入病例对话框
+                dialogVisible4: false,
+//增加医生信息
+                ruleForm:{
+                    id:'',
+                    clientname:'',
+                    clientgender:'',
+                    clientage:'',
+                    clientsalary:''
+                },
+                rules:{
+                    id:[
+                        {required:true,message:'请输入编号',trigger:'blur'},
+                    ],
+                    clientname:[
+                        {required:true,message:'请输入姓名',trigger:'blur'},
+//{min:3,max:5,message:'长度在3到5个字符',trigger:'blur'}
+                    ],
+                    clientgender:[
+                        {required:true,message:'请选择性别',trigger:'change'}
+                    ],
+                    clientage:[
+                        {required:true,message:'请输入年龄',trigger:'blur'},
+                    ],
+                    clientsalary:[
+                        {required:true,message:'请输入消费额',trigger:'blur'},
+                    ]
+                },
+//搜索医生
+                formInline:{
+                    id:'',
+                    clientname:'',
+                    clientgender:''
+                },
+//从数据库查找
+                clients:[],
+//底部分页条,当前页
+                currentPage:1,
+//总条数
+                total:0,
+//每页显示的条数
+                pagesize:5,
+//修改
+                form:{
+                    id:'',
+                    clientname:'',
+                    clientgender:'',
+                    clientage:'',
+                    clientsalary:''
+                }
+            }
+        },
+//页面加载完成后发送请求，并接受数据
+        mounted(){
+            this.selectall()
+        }
+    })
+</script>
+<hr>
+<center><font face="楷体" size="4" color="#a9a9a9">神洲科技有限公司&reg; 京公网安备11000000000001号 京ICP证010100号 版权所有,侵权必究&copy; 联系开发者:enzhoug@foxmail.com</font></center>
+<br><br><br><br>
+</body>
+</html>

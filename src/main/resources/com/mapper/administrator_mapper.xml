@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.administrator_mapper">
+    <!--查看所有医生信息-->
+    <select id="selectdoctor" resultType="com.pojo.administrator.Doctor">
+        select *from doctor;
+    </select>
+    <!--添加医生-->
+    <insert id="adddoctor" >
+        insert into doctor values(#{id},#{doctorname},#{doctorgender},#{doctorage},#{doctorsalary});
+    </insert>
+    <!--查找每页显示的条数-->
+
+    <!--查找总条数-->
+    <select id="selecttotalpage" resultType="java.lang.Integer">
+        select count(*) from doctor;
+    </select>
+    <select id="selectpagelist" resultType="com.pojo.administrator.Doctor">
+        select * from doctor limit #{start},#{num};
+    </select>
+    <!--按条件查找-->
+    <select id="selectbycondition" resultType="com.pojo.administrator.Doctor">
+        select *from doctor <where>
+        <if test="doctor.id !=0"> id like #{doctor.id}</if>
+        <if test="doctor.doctorname !=null and doctor.doctorname!=''">and doctorname like #{doctor.doctorname}</if>
+        <if test="doctor.doctorgender !=null and doctor.doctorgender!=''">and doctorgender like #{doctor.doctorgender}</if>
+    </where> limit #{start},#{num};
+    </select>
+    <select id="selecttotalbycondition" resultType="java.lang.Integer">
+        select count(*) from doctor <where>
+        <if test="id !=0"> id like #{id}</if>
+        <if test="doctorname !=null and doctorname!=''">and doctorname like #{doctorname}</if>
+        <if test="doctorgender !=null and doctorgender!=''">and doctorgender like #{doctorgender}</if>
+    </where>
+    </select>
+
+    <!--修改医生信息-->
+    <update id="updatedoctor">
+        update doctor <set>
+        <if test="doctorname!=null and doctorname!=''">doctorname=#{doctorname}</if>
+        <if test="doctorgender !=null and doctorgender!=''">,doctorgender=#{doctorgender}</if>
+        <if test="doctorage !=null and doctorage!=''">,doctorage=#{doctorage}</if>
+        <if test="doctorsalary !=null and doctorsalary!=''">,doctorsalary=#{doctorsalary}</if>
+    </set>
+        where id=#{id};
+    </update>
+
+    <!--删除医生信息-->
+    <delete id="deletedoctor">
+        delete from doctor where id=#{id};
+    </delete>
+
+    <!--查找药品-->
+    <select id="selectmedicine" resultType="com.pojo.administrator.Medicine">select *from medicine;</select>
+    <!--添加药品-->
+    <insert id="addmedicine">
+        insert into medicine values(#{id},#{medicinename},#{medicineprice},#{medicineinventory},#{medicinesupplier},#{medicineintroduce});
+    </insert>
+    <!--查找药品总数目-->
+    <select id="selecttotalmedicine" resultType="java.lang.Integer">
+        select count(*) from medicine;
+    </select>
+    <!--分页查找药品-->
+    <select id="selectmedicinelist" resultType="com.pojo.administrator.Medicine">
+        select * from medicine limit #{start},#{num};
+    </select>
+    <!--按条件分页查找药品-->
+    <select id="medicineselectbycondition" resultType="com.pojo.administrator.Medicine">
+        select *from medicine <where>
+        <if test="medicine.id !=0"> id like #{medicine.id}</if>
+        <if test="medicine.medicinename !=null and medicine.medicinename!=''">
+                and medicinename like #{medicine.medicinename}</if>
+    </where> limit #{start},#{num};
+    </select>
+    <!--按条件查找药品的数目-->
+    <select id="medicineselecttotalbycondition" resultType="java.lang.Integer">
+        select count(*) from medicine <where>
+        <if test="id !=0"> id like #{id}</if>
+        <if test="medicinename !=null and medicinename!=''">
+                        and medicinename like #{medicinename}</if>
+    </where>
+    </select>
+    <!--修改药品-->
+    <update id="updatemedicine">
+        update medicine <set>
+        <if test="medicinename!=null and medicinename!=''">medicinename=#{medicinename}</if>
+        <if test="medicineprice !=null and medicineprice!=''">,medicineprice=#{medicineprice}</if>
+        <if test="medicineinventory !=null and medicineinventory!=''">,medicineinventory=#{medicineinventory}</if>
+        <if test="medicinesupplier!=null and medicinesupplier!=''">,medicinesupplier=#{medicinesupplier}</if>
+        <if test="medicineintroduce!=null and medicineintroduce!=''">,medicineintroduce=#{medicineintroduce}</if>
+    </set>
+        where id=#{id};
+    </update>
+    <!--删除药品-->
+    <delete id="deletemedicine">
+        delete from medicine where id=#{id};
+    </delete>
+</mapper>
